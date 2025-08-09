@@ -1,25 +1,25 @@
-from setuptools import setup, find_packages
+from setuptools import setup
+
+# lê o conteúdo do README.md
+from os import path
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
-    name="cbpi4-BrewPiLessAdvancedFermentationController",   # mesmo nome do plugin.json
-    version="0.1",
-    author="Gustavo Zimer",
-    description="Plugin de controle avançado de fermentação para CraftBeerPi 4 inspirado no BrewPiLess",
-    packages=find_packages(),  # vai pegar os pacotes Python na pasta
-    include_package_data=True,  # inclui arquivos externos (ex: config.yaml)
-    install_requires=[
-        # Coloque aqui alguma dependência que seu plugin precise, exemplo:
-        # 'numpy',
-    ],
-    entry_points={
-        "cbpi4.fermenter_controller": [
-            "BrewPiLessAdvancedFermentationController = brewpiless_fermentation:BrewPiLessAdvancedFermentationController",
-        ],
+    name='cbpi4-BrewPiLessAdvancedFermentationController',
+    version='0.1',
+    description='Plugin de controle avançado de fermentação para CraftBeerPi 4 inspirado no BrewPiLess',
+    author='Gustavo Zimer',
+    url='https://github.com/Zimer-Gbz/cbpi4-BrewPiLessAdvancedFermentationController',
+    include_package_data=True,
+    package_data={
+        # inclui arquivos adicionais como .yaml, .json, etc
+        '': ['*.txt', '*.rst', '*.yaml', '*.json'],
+        'cbpi4-BrewPiLessAdvancedFermentationController': ['*', '*.txt', '*.rst', '*.yaml', '*.json']
     },
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Operating System :: POSIX :: Linux",
-    ],
-    python_requires='>=3.7',
+    packages=['cbpi4-BrewPiLessAdvancedFermentationController'],
+    long_description=long_description,
+    long_description_content_type='text/markdown'
 )
 

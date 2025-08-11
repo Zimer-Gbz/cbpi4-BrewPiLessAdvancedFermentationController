@@ -36,6 +36,8 @@ class FridgeCompressor(AktorBase):
 
 
 class BrewPiLessAdvancedFermentationController(ControlBase):
+
+    # Propriedades configuráveis no CBPi4
     beer_sensor = Property.Sensor("Sensor de Fermentador", description="Sonda na cerveja")
     fridge_sensor = Property.Sensor("Sensor da Câmara", description="Sonda na câmara")
     heater = Property.Actor("Aquecedor", description="Atuador de aquecimento")
@@ -58,20 +60,26 @@ class BrewPiLessAdvancedFermentationController(ControlBase):
     STATE_ERROR = "ERROR"
 
     def init(self):
-        self.pid = PID(self.kp, self.ki, self.kd, self.cycle_time)
-        self.state = self.STATE_IDLE
-        self.state_since = time.time()
-        self.last_cool = None
-        self.last_heat = None
-        self.wait_start = None
+        try:
+            super().init()
+            self.pid = PID(self.kp, self.ki, self.kd, self.cycle_time)
+            self.state = self.STATE_IDLE
+            self.state_since = time.time()
+            self.last_cool = None
+            self.last_heat = None
+            self.wait_start = None
+        except Exception as e:
+            logging.error(f"[BrewPiLess] Erro na init(): {e}")
 
     @property
     def beer_temp(self):
-        return self.get_sensor_value(self.beer_sensor)
+        val = self.get_sensor_value(self.beer_sensor)
+        return val.get("value") if isinstance(val, dict) else val
 
     @property
     def fridge_temp(self):
-        return self.get_sensor_value(self.fridge_sensor)
+        val = self.get_sensor_value(self.fridge_sensor)
+        return val.get("value") if isinstance(val, dict) else val
 
     def enter_state(self, new_state):
         self.state = new_state
@@ -83,7 +91,7 @@ class BrewPiLessAdvancedFermentationController(ControlBase):
         if self.beer_temp is None:
             return False
         if self.beer_temp <= self.freeze_protect_temp:
-            self.notify("Proteção anti-congelamento ativada, não ligando resfriador")
+            self.notify("Proteção anti-congelamento: não ligar resfriador")
             return False
         if self.last_cool is None:
             return True
@@ -153,12 +161,12 @@ class BrewPiLessAdvancedFermentationController(ControlBase):
         try:
             while self.is_running():
                 self.control()
-                time.sleep(int(self.cycle_time))  # correção: uso de time.sleep
+                time.sleep(int(self.cycle_time))
         except Exception as e:
-            logging.error(f"Erro no plugin BrewPiLessAdvancedFermentationController: {e}")
+            logging.error(f"[BrewPiLess] Erro no run(): {e}")
             self.api.switch_off(self.cooler)
             self.api.switch_off(self.heater)
 
-# Registro do plugin no CraftBeerPi (sem decorador de fermenter_controller)
+
 def setup(cbpi):
     cbpi.plugin.register("BrewPiLessAdvancedFermentationController", BrewPiLessAdvancedFermentationController)

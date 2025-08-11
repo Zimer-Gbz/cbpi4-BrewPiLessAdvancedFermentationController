@@ -28,14 +28,13 @@ class PID:
 
 @cbpi.actor
 class FridgeCompressor(AktorBase):
-    def on(self, **kwargs): 
+    def on(self, **kwargs):
         self.api.switch_on(self.id)
 
-    def off(self, **kwargs): 
+    def off(self, **kwargs):
         self.api.switch_off(self.id)
 
 
-@cbpi.fermenter_controller
 class BrewPiLessAdvancedFermentationController(ControlBase):
     beer_sensor = Property.Sensor("Sensor de Fermentador", description="Sonda na cerveja")
     fridge_sensor = Property.Sensor("Sensor da Câmara", description="Sonda na câmara")
@@ -151,10 +150,15 @@ class BrewPiLessAdvancedFermentationController(ControlBase):
                 self.enter_state(self.STATE_IDLE)
 
     def run(self):
-        while self.is_running():
-            self.control()
-            self.sleep(int(self.cycle_time))
+        try:
+            while self.is_running():
+                self.control()
+                time.sleep(int(self.cycle_time))  # correção: uso de time.sleep
+        except Exception as e:
+            logging.error(f"Erro no plugin BrewPiLessAdvancedFermentationController: {e}")
+            self.api.switch_off(self.cooler)
+            self.api.switch_off(self.heater)
 
-# Registro do plugin no CraftBeerPi
+# Registro do plugin no CraftBeerPi (sem decorador de fermenter_controller)
 def setup(cbpi):
     cbpi.plugin.register("BrewPiLessAdvancedFermentationController", BrewPiLessAdvancedFermentationController)

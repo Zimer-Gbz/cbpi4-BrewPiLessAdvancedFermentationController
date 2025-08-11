@@ -2,7 +2,7 @@
   "name": "cbpi4-BrewPiLessAdvancedFermentationController",
   "version": "0.1",
   "author": "Gustavo Zimer",
-  "description": "Plugin de controle avançado de fermentação inspirado no BrewPiLess com PID dinâmico, proteções e máquina de estados.",
+  "description": "Plugin de controle avançado de fermentação inspirado no BrewPiLess.",
   "category": "fermenter_controller",
-  "entry_point": "brewpiless_fermentation.BrewPiLessAdvancedFermentationController"
+  "entry_point": "cbpi4-BrewPiLessAdvancedFermentationController:BrewPiLessAdvancedFermentationController"
 }
